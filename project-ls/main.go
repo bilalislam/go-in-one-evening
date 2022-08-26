@@ -1,19 +1,24 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 )
 
+var hidden = flag.Bool("a", false, "show hidden files")
+
 func main() {
-	files := listFiles("./testdata")
+	flag.Parse()
+	files := listFiles("./testdata", *hidden)
 	for _, e := range files {
 		fmt.Println(e)
 	}
 }
 
-func listFiles(dirname string) []string {
+func listFiles(dirname string, hidden bool) []string {
 	var dirs []string
 
 	files, err := ioutil.ReadDir(dirname)
@@ -22,7 +27,13 @@ func listFiles(dirname string) []string {
 	}
 
 	for _, f := range files {
-		dirs = append(dirs, f.Name())
+		if !hidden {
+			if !strings.HasPrefix(f.Name(), ".") {
+				dirs = append(dirs, f.Name())
+			}
+		} else {
+			dirs = append(dirs, f.Name())
+		}
 	}
 
 	return dirs
