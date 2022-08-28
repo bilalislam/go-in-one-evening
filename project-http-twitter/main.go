@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	errors "errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 type TweetRepository interface {
@@ -48,12 +50,16 @@ type server struct {
 }
 
 func (s server) tweets(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	defer time.Since(start)
+	duration := start
 
 	if r.Method == http.MethodPost {
 		s.addTweet(w, r)
 	} else if r.Method == http.MethodGet {
 		s.listTweets(w, r)
 	}
+	fmt.Printf("%s %s %s\n", r.Method, r.URL, duration)
 }
 
 func (s server) addTweet(w http.ResponseWriter, r *http.Request) {
